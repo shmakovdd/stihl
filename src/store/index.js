@@ -1,9 +1,15 @@
 import { createStore } from "vuex";
 import { sliderModule } from "./sliderModule";
 export default createStore({
-  state: {},
+  state: {
+    isMenuShow: false,
+  },
   getters: {},
-  mutations: {},
+  mutations: {
+    setIsMenuShow(state, payload) {
+      state.isMenuShow = payload
+    }
+  },
   actions: {},
   modules: {
     sliderModule: sliderModule,

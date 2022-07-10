@@ -1,10 +1,12 @@
 @import "./mixins";
-
+@import "./variables.scss";
 @include font-face(Bodoni-Bold, '@/assets/fonts/Bodoni-Bold', null, null, woff2);
 @include font-face(Montserrat-Regular, '@/assets/fonts/Montserrat-Regular', null, null, woff2);
 @include font-face(Montserrat-Bold, '@/assets/fonts/Montserrat-Bold', null, null, woff2);
 
-
+:root {
+    --width-ratio: calc(70vw / 900px)
+}
 
 #app {
     height: 100vh;
@@ -13,9 +15,6 @@
 
 img {
     display: block;
-}
-
-svg {
     max-width: 100%;
 }
 
@@ -25,6 +24,8 @@ html, button {
 
 button {
     border: none;
+    background: transparent;
+    text-transform: uppercase;
 }
 
 body {

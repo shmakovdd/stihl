@@ -1,20 +1,21 @@
 <template>
   <div class="slider">
     <div class="slider__content">
-      <div
-        v-for="(row, index) of getCurrentSlide.rows"
-        :key="index"
-        class="slider__span-wrapper"
-      >
-        <div ref="text" class="slider__span-text">
-          {{ row }}
+      <div class="slider__headers">
+        <div
+          v-for="(row, index) of getCurrentSlide.rows"
+          :key="index"
+          class="slider__text-wrapper"
+        >
+          <div ref="text" class="slider__text">
+            {{ row }}
+          </div>
+          <div ref="fill" class="slider__text-fill"></div>
         </div>
-        <div ref="fill" class="slider__span-fill"></div>
       </div>
+
       <app-paragraph class="slider__paragraph" />
-      <transition appear name="slider__button" mode="out-in">
-        <app-button v-show="show" class="slider__button" />
-      </transition>
+      <app-button class="slider__button" />
     </div>
     <div class="slider__orangeback">
       <transition appear name="slider__flip-text" mode="out-in"
@@ -37,7 +38,6 @@
 </template>
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
-import AppButton from "@/components/UI/AppButton.vue";
 import AppParagraph from "@/components/AppParagraph.vue";
 import AppSwitcher from "@/components/AppSwitcher.vue";
 import AppPagination from "@/components/AppPagination.vue";
@@ -46,7 +46,6 @@ export default {
     AppParagraph,
     AppSwitcher,
     AppPagination,
-    AppButton,
   },
 
   data() {
@@ -70,7 +69,7 @@ export default {
   },
   watch: {
     show() {
-      this.animateText();
+      setTimeout(this.animateText, 0); // setTimeout 0 - для того, чтобы vue успел отрисовать DOM дерево //
     },
   },
   methods: {
@@ -78,52 +77,66 @@ export default {
       setShow: "sliderModule/setShow",
       setCurrentSlideIndex: "sliderModule/setCurrentSlideIndex",
     }),
-    animateText() {
-      console.log(this.$refs.text);
-      Array.from(this.$refs.text).reduce((prev, current) => {
-        setTimeout(() => {
-          if (this.show) {
-            current.classList.add("slider__span-text--show");
-          } else {
-            current.classList.remove("slider__span-text--show");
-          }
-        }, prev);
-        return (prev += 200);
-      }, 500);
-      this.$refs.fill.forEach((item, index) => {
-        setTimeout(() => {
-          item.classList.add("slider__span-fill--show");
-          setTimeout(() => {
-            item.classList.remove("slider__span-fill--show");
-          }, this.animationTime);
-        }, index * 200);
-      });
+    async animateText() {   // Анимация для текста
+      let setClassesToText = async () => {
+        for( let item of this.$refs.text) {
+          this.setTextClass(item);
+          await this.waiter(200);
+        }
+      }
+      let setClassesToFill = async () => {
+        for(let item of this.$refs.fill) {
+          this.setFillClass(item);
+          await this.waiter(200);
+        }
+      }
+      setClassesToFill();
+      await this.waiter(500);
+      setClassesToText();
     },
 
-    changeSlide(data) {
+    setTextClass(item) { // ставим класс для текста
+      if (this.show) {
+        item.classList.add("slider__text--show");
+      } else {
+        item.classList.remove("slider__text--show");
+      } 
+    },
+    async setFillClass(item) { // ставим класс для филера
+      item.classList.add("slider__text-fill--show");
+      await this.waiter(this.animationTime);
+      item.classList.remove("slider__text-fill--show");
+    },
+
+    waiter(delay) {
+      return new Promise(resolve => {
+        setTimeout(resolve, delay)
+      })
+    },
+
+    changeSlide(data) {    //переход на слайд по клику на стрелочки
       if (data.isDirty) {
         this.findBarWithIndex();
-        this.clearSlide();
+        this.resetInterval();
         this.moveToNextSlide(data);
       } else {
         this.changeSlideIndex(data);
       }
     },
 
-    findBarWithIndex() {
+    findBarWithIndex() {  // находим progress bar с нужным индексом
       let index = this.getCurrentSlideIndex;
       let bar = document.querySelector(`[data-index='${index}']`);
       this.changeBarTransformOrigin(bar);
     },
 
-    changeBarTransformOrigin(bar) {
+    async changeBarTransformOrigin(bar) { // меняем transform нужного progressbar
       bar.style.transformOrigin = "0 0";
-      setTimeout(() => {
-        bar.style.transformOrigin = "";
-      }, this.resetTime);
+      await this.waiter(this.resetTime)
+      bar.style.transformOrigin = "";
     },
 
-    changeSlideIndex(data) {
+    changeSlideIndex(data) {       // меняем индекс слайда
       if (this.getCurrentSlideIndex + data.direction >= this.slides.length) {
         this.setCurrentSlideIndex(0);
       } else if (this.getCurrentSlideIndex + data.direction === -1) {
@@ -133,23 +146,22 @@ export default {
       }
     },
 
-    clearSlide() {
+    resetInterval() {       // сбрасываем интервал
       clearTimeout(this.interval);
       this.setShow(false);
       this.interval = null;
     },
 
-    moveToNextSlide(data) {
-      setTimeout(() => {
+    async moveToNextSlide(data) {  // переход на следующий слайд
+      await this.waiter(this.resetTime)       
         this.changeSlideIndex(data);
         this.setShow(true);
         this.startTimer();
-      }, this.resetTime);
     },
 
-    startTimer() {
+    startTimer() { // запуск таймера
       this.interval = setTimeout(() => {
-        this.clearSlide();
+        this.resetInterval();
         this.moveToNextSlide({ direction: 1 });
       }, this.sliderShowTime);
     },
@@ -171,15 +183,19 @@ export default {
   position: relative;
 
   &__button {
-    &-enter-from,
-    &-leave-to {
-      transform: scaleY(0);
-      opacity: 0;
+    @media screen and (max-width: 540px) {
+      width: 100%;
     }
-    &-enter-active,
-    &-leave-active {
-      transition: 1s;
+    margin-top: 20px;
+  }
+
+  &__pagination {
+    @media screen and (max-width: 540px) {
+      display: none;
     }
+    position: absolute;
+    right: 25px;
+    bottom: 12%;
   }
 
   &__switcher {
@@ -189,9 +205,15 @@ export default {
   }
 
   &__paragraph {
+    @media screen and (max-width: 540px) {
+      display: none;
+    }
     margin-top: 15px;
   }
   &__orangeback {
+    @media screen and (max-width: 540px) {
+      width: 0;
+    }
     position: relative;
     height: 100%;
     width: 30%;
@@ -200,27 +222,27 @@ export default {
     background: #d28154;
   }
 
-  &__span-wrapper {
+  &__text-wrapper {
     width: fit-content;
     position: relative;
   }
 
-  &__span-text {
+  &__text {
     opacity: 0;
     &--show {
       opacity: 1;
     }
   }
 
-  &__span-fill {
+  &__text-fill {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 0;
-    background: #f46717;
+    background: $main-color;
     transform-origin: 100% 0;
     &--show {
-      animation: fillBackground 1s ease-out;
+      animation: fillBackground $transition-time ease-out;
     }
   }
 
@@ -246,7 +268,15 @@ export default {
   }
 
   &__image-wrapper {
+    @media screen and(max-width: 1366px) {
+      width: 65vw;
+    }
+    @media screen and (max-width: 540px) {
+      transform: translateX(-100%);
+      width: 100vw;
+    }
     height: 100%;
+    width: 70vw;
     position: absolute;
     left: 0;
     transform: translateX(-50%);
@@ -254,27 +284,64 @@ export default {
     align-items: center;
     &-enter-from,
     &-leave-to {
-      left: 200%;
+      transform: translateX(200%);
     }
     &-enter-active {
-      transition: 1s cubic-bezier(0, -0.02, 0.4, 0.99);
+      transition: $transition-time cubic-bezier(0, -0.02, 0.4, 0.99);
     }
     &-leave-active {
-      transition: 1s cubic-bezier(0.59, 0.01, 1, 0.99);
+      transition: $transition-time cubic-bezier(0.59, 0.01, 1, 0.99);
     }
   }
 
+  &__image {
+    @media screen and(max-width: 980px) {
+      max-height: 54vh;
+    }
+    @media screen and (max-width: 540px) {
+      margin-top: 20px;
+    }
+    margin: 0 auto;
+  }
+
   &__content {
+    @media screen and(max-width: 1600px) {
+      padding: 0 0 0 80px;
+      font-size: 62px;
+    }
+
+    @media screen and(max-width: 1366px) {
+      width: 55%;
+      padding: 0 0 0 40px;
+      font-size: 45px;
+    }
+
+    @media screen and(max-width: 780px) {
+      font-size: 40px;
+    }
+
+    @media screen and(max-width: 540px) {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 27px;
+      padding: 0 40px;
+      height: 77%;
+      width: 100%;
+    }
     font-family: "Bodoni-Bold";
     font-size: 72px;
     padding: 0 220px;
     width: 70%;
     font-weight: bold;
-    color: #121212;
+    color: $black;
   }
 
   &__flip-text {
-    color: #f5f5f5;
+    @media screen and (max-width: 1600px) {
+      font-size: 102px;
+    }
+    color: $white;
     writing-mode: vertical-rl;
     font-family: "Bodoni-Bold";
     font-weight: bold;
@@ -290,10 +357,10 @@ export default {
       left: -25%;
     }
     &-enter-active {
-      transition: 1s ease-out;
+      transition: $transition-time ease-out;
     }
     &-leave-active {
-      transition: 1s ease-in;
+      transition: $transition-time ease-in;
     }
   }
 }

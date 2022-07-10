@@ -1,15 +1,16 @@
 <template>
   <app-cursor />
-  <app-header/>
+  <app-header />
+  <app-menu />
   <router-view></router-view>
 </template>
 <script>
-import AppCursor from "@/components/UI/AppCursor.vue";
 import AppHeader from "@/components/AppHeader.vue";
+import AppMenu from "@/components/AppMenu.vue";
 export default {
   components: {
-    AppCursor,
     AppHeader,
+    AppMenu,
   },
 };
 </script>

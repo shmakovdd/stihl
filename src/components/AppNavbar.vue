@@ -19,21 +19,31 @@ export default {};
 </script>
 <style lang="scss" scoped>
 .nav {
-  color: #121212;
+
+  color: $black;
   &__list {
     display: flex;
+    margin-right: 40px;
   }
   &__item {
     margin-right: 40px;
+    &:last-child {
+      margin: 0;
+    }
+    @media screen and (max-width: 1600px) {
+      margin-right: 20px;
+    }
   }
   &__button {
     text-transform: uppercase;
     font-family: "Montserrat-Bold";
     font-size: 16px;
-    background: transparent;
-    transition: .2s;
+    transition: 0.2s;
     &:hover {
-        opacity: .4;
+      opacity: 0.4;
+    }
+    @media screen and (max-width: 1600px) {
+      font-size: 14px;
     }
   }
 }

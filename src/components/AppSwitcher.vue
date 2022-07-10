@@ -62,9 +62,14 @@ export default {
   }
 }
 .switcher {
+  @media screen and (max-width: 540px) {
+    width: 50%;
+    height: 50px;
+  }
   width: 330px;
   height: 90px;
   background: #f1ebe8;
+
   &__bars {
     display: flex;
     width: 100%;

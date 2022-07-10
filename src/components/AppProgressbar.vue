@@ -21,10 +21,10 @@ export default {
 .progress-bar {
   height: 8px;
   background: #f1ebe8;
-  border-right: 7px solid #f37a1f;
+  border-right: 7px solid $main-color;
   &__inner {
     height: 100%;
-    background: #f37a1f;
+    background: $main-color;
     width: 100%;
     transform: scaleX(0);
     transform-origin: 100% 0;

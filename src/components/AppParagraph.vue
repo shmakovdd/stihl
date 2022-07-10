@@ -27,18 +27,19 @@ export default {
 };
 </script>
 <style lang="scss">
-
 .paragraph {
+
   display: flex;
   &__line-wrapper {
     width: 50px;
+    flex-shrink: 0;
     padding-top: 10px;
     margin-right: 20px;
   }
   &__line {
     width: 0;
     height: 2px;
-    background: #f37a1f;
+    background: $main-color;
     transition: 1s ease-in;
 
     &--show {

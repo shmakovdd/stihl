@@ -39,22 +39,19 @@ export default {
   font-family: "Montserrat-Bold";
   overflow: hidden;
   width: 50px;
-  position: absolute;
-  right: 25px;
-  bottom: 12%;
   &__current-page,
   &__all-pages {
     writing-mode: vertical-rl;
   }
   &__separator {
-    background: #f5f5f5;
+    background: $white;
     height: 4px;
     margin: 10px auto;
   }
   &__current-page {
     font-size: 48px;
     position: relative;
-    color: #121212;
+    color: $black;
     left: 0;
     transition: 1s ease-out;
     &-enter-from, &-leave-to {
@@ -62,7 +59,7 @@ export default {
     }
   }
   &__all-pages {
-    color: #f5f5f5;
+    color: $white;
     font-size: 24px;
     margin-left: auto;
   }

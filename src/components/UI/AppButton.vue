@@ -1,5 +1,5 @@
 <template>
-  <button class="button">
+  <button :class="{'hidden': !show}" class="button">
     <div class="button__text">
       <slot>УЗНАТЬ БОЛЬШЕ</slot>
     </div>
@@ -8,13 +8,22 @@
   </button>
 </template>
 <script>
-export default {};
+import { mapState } from 'vuex';
+export default {
+  computed: {
+    ...mapState({
+      show: state => state.sliderModule.show,
+    })
+  },
+  name: 'app-button'
+};
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .button {
   position: relative;
+  transition: $transition-time;
   font-family: "Montserrat-Bold";
-  background: #121212;
+  background: $black;
   padding: 10px 20px;
   font-size: 16px;
   color: #ffffff;
@@ -30,7 +39,7 @@ export default {};
     width: 100%;
     z-index: 0;
     position: absolute;
-    background: #f37a1f;
+    background: $main-color;
     transform: scaleX(0);
     transform-origin: 100% 0;
     transition: transform 0.3s;
@@ -49,5 +58,9 @@ export default {};
     transform: scaleX(1);
     transform-origin: 0 0;
   }
+}
+.hidden {
+  transform: scaleY(0);
+  opacity: 0
 }
 </style>

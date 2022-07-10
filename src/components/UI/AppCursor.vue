@@ -9,6 +9,7 @@ export default {
       let cursor = this.$refs.cursor;
       let cursorInner = this.$refs.cursorInner;
       window.addEventListener("mousemove", (event) => {
+        if (document.body.clientWidth < 540) return;
         let mouse = {
           x: event.clientX,
           y: event.clientY,
@@ -18,7 +19,7 @@ export default {
         cursorInner.style.left = mouse.x + "px";
         cursor.style.top = mouse.y + "px";
         cursor.style.left = mouse.x + "px";
-        if (event.target.closest("button") || event.target.closest('li')) {
+        if (event.target.closest("button") || event.target.closest("li")) {
           cursor.classList.add("active");
           cursorInner.classList.add("active");
         } else {
@@ -31,6 +32,7 @@ export default {
   mounted() {
     this.followCursor();
   },
+  name: "app-cursor",
 };
 </script>
 <style lang="scss">
@@ -40,6 +42,9 @@ export default {
   z-index: 10000000;
   position: absolute;
   transform: translate(-50%, -50%);
+  @media screen and (max-width: 540px) {
+    display: none;
+  }
 }
 
 .cursor {
@@ -53,14 +58,14 @@ export default {
   &-inner {
     width: 6px;
     height: 6px;
-    background-color: #f37a1f;
+    background-color: $main-color;
     border-radius: 50%;
   }
 }
 .cursor.active {
   width: 22px;
   height: 22px;
-  background-color: rgba($color: #f37a1f, $alpha: 0.6);
+  background-color: rgba($color: $main-color, $alpha: 0.6);
 }
 
 .cursor-inner.active {
